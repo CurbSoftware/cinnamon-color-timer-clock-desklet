@@ -2,7 +2,11 @@
 
 A Cinnamon desklet with three cards (**Clock**, **Timer** and **Chronometer**) whose background colors follow a schedule you define. Each card's color ramps between (time, color) stops: the clock by time of day wrapping over midnight, the timer by time remaining, the chronometer by time elapsed.
 
-![Color Timer Clock desklet](screenshot.png)
+![Color Timer Clock desklet](screenshots/color-timer-clock-desklet.webp)
+
+The settings window:
+
+![Color Timer Clock settings](screenshots/color-timer-clock-config.webp)
 
 ## Why this exists
 

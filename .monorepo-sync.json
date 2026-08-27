@@ -2,7 +2,7 @@
   "generator": "dev-tools/sync-spice-project.py",
   "managed_files": {
     "LICENSE": "e00989f872a62991eba15c3c920a06cb8837a00428151aebacc97464b143bdb3",
-    "README.md": "f553566785fe6f7f6d0fd8ab1dbc6204085cf50dc43f61ece7bce51a0c4552b9",
+    "README.md": "ec601c5cdb0324f572a8783c764b9279656ed6738bf161f8f32f2822e4f3e53d",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/cardActions.js": "758ed5bdfae583d741cacb1b674b3789cc29f9803836ddfb04e7e3c7be8a5357",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/desklet.js": "20dfe3e22462f1db5056ec5aa80a232203ba694ef04ae26fa2a099c67bde4d65",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/icon.png": "8ccca668d7f208d024064a9de5c3207fa916784c597cc4b19aec48a6976adc44",
@@ -12,12 +12,14 @@
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/stylesheet.css": "f5811434165da442319ac8a92b3ea271d3ad1017fba5b6c87e9e3529be8b9729",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/timezoneWidget.py": "1c63f0bd6844071ff4bf4b49d27fffc98a52b5bcaa8253c536180e9cb2b3f1da",
     "info.json": "0b8c18a03c477f48e482587029008263efa4c6b4ebfdd292de148674ba3fcf6d",
-    "screenshot.png": "b415aaea68a3500ee95aee463e81e7930515d206cfcfcc3e3961d1927232cb0e"
+    "screenshot.png": "b415aaea68a3500ee95aee463e81e7930515d206cfcfcc3e3961d1927232cb0e",
+    "screenshots/color-timer-clock-config.webp": "518cb093f7a935bb980a5be66fda987801dbd9349671e01a4f884351840e933a",
+    "screenshots/color-timer-clock-desklet.webp": "f67e0f93f782503c2a7247cccc3990fe160c89a35121476f1626d81d339fe1e8"
   },
   "schema": 1,
   "source_directory": "cinnamon-color-timer-clock-desklet@curbsoftware",
   "source_repository": "CurbSoftware/cinnamon-monorepo",
-  "source_revision": "a47890062e9a71c093b8118e5bf2c8a2d8737215",
+  "source_revision": "2376db874d65fee1cf54f873586da7f8b4538b69",
   "source_worktree_dirty": false,
   "spice": {
     "alias": "color-clock",
