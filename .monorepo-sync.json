@@ -7,7 +7,7 @@
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/desklet.js": "20dfe3e22462f1db5056ec5aa80a232203ba694ef04ae26fa2a099c67bde4d65",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/icon.png": "8ccca668d7f208d024064a9de5c3207fa916784c597cc4b19aec48a6976adc44",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/metadata.json": "9fcbee9dc39f521a6b27866cfa0b56b37a77873723e2ff876acec17e054d849a",
-    "files/cinnamon-color-timer-clock-desklet@curbsoftware/po/cinnamon-color-timer-clock-desklet@curbsoftware.pot": "87f399feca0d550f0661e20d0f0e4ce442bb7646ea5475394f05e13c809fe18e",
+    "files/cinnamon-color-timer-clock-desklet@curbsoftware/po/cinnamon-color-timer-clock-desklet@curbsoftware.pot": "913c86abb7c1a6365a9194992465ac21ce1a115a06ff91ca1cee4b7c7c0f9929",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/settings-schema.json": "e3bdcac9cc929f83e56a88ac2f39b70a4ed5181226121ed960f2e880292fc8ee",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/stylesheet.css": "f5811434165da442319ac8a92b3ea271d3ad1017fba5b6c87e9e3529be8b9729",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/timezoneWidget.py": "1c63f0bd6844071ff4bf4b49d27fffc98a52b5bcaa8253c536180e9cb2b3f1da",
@@ -19,7 +19,7 @@
   "schema": 1,
   "source_directory": "cinnamon-color-timer-clock-desklet@curbsoftware",
   "source_repository": "CurbSoftware/cinnamon-monorepo",
-  "source_revision": "2376db874d65fee1cf54f873586da7f8b4538b69",
+  "source_revision": "e4be335a0cae6bcd02dfcbacf1258d1f25d78de0",
   "source_worktree_dirty": false,
   "spice": {
     "alias": "color-clock",
