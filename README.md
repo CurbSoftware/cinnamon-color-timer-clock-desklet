@@ -4,6 +4,10 @@ A Cinnamon desklet with three cards (**Clock**, **Timer** and **Chronometer**) w
 
 ![Color Timer Clock desklet](screenshots/color-timer-clock-desklet.webp)
 
+On the desktop:
+
+![Color Timer Clock on the desktop](screenshots/fulldesktop-color-grid-clocks-timer-chrono.webp)
+
 The settings window:
 
 ![Color Timer Clock settings](screenshots/color-timer-clock-config.webp)

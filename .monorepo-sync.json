@@ -2,7 +2,7 @@
   "generator": "dev-tools/sync-spice-project.py",
   "managed_files": {
     "LICENSE": "e00989f872a62991eba15c3c920a06cb8837a00428151aebacc97464b143bdb3",
-    "README.md": "1733ffb485bd8d7c6b3c57d9e5ee5e5e9bd7a994cdb999e7a7ffcd64300a1062",
+    "README.md": "95907bbd967a12e35175c899fe67374d2723efdada0dcac02cf5951252992f08",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/cardActions.js": "758ed5bdfae583d741cacb1b674b3789cc29f9803836ddfb04e7e3c7be8a5357",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/desklet.js": "20dfe3e22462f1db5056ec5aa80a232203ba694ef04ae26fa2a099c67bde4d65",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/icon.png": "9a24b9661cea8ef43931aa7d38fc26e16ee07af0051cfd71d7a1ae787347cc38",
@@ -14,12 +14,13 @@
     "info.json": "0b8c18a03c477f48e482587029008263efa4c6b4ebfdd292de148674ba3fcf6d",
     "screenshot.png": "b415aaea68a3500ee95aee463e81e7930515d206cfcfcc3e3961d1927232cb0e",
     "screenshots/color-timer-clock-config.webp": "518cb093f7a935bb980a5be66fda987801dbd9349671e01a4f884351840e933a",
-    "screenshots/color-timer-clock-desklet.webp": "f67e0f93f782503c2a7247cccc3990fe160c89a35121476f1626d81d339fe1e8"
+    "screenshots/color-timer-clock-desklet.webp": "f67e0f93f782503c2a7247cccc3990fe160c89a35121476f1626d81d339fe1e8",
+    "screenshots/fulldesktop-color-grid-clocks-timer-chrono.webp": "54727197d47b1ed651a17616bbf842c935ea41b6907dd31d3d0c7c81893093f1"
   },
   "schema": 1,
   "source_directory": "cinnamon-color-timer-clock-desklet@curbsoftware",
   "source_repository": "CurbSoftware/cinnamon-monorepo",
-  "source_revision": "09ab503f96e6742e62c6493c6da8c5b965ebff10",
+  "source_revision": "8b66331a80bbc383578a82a628ec3689570ef93c",
   "source_worktree_dirty": false,
   "spice": {
     "alias": "color-clock",
