@@ -2,7 +2,7 @@
   "generator": "dev-tools/sync-spice-project.py",
   "managed_files": {
     "LICENSE": "e00989f872a62991eba15c3c920a06cb8837a00428151aebacc97464b143bdb3",
-    "README.md": "95907bbd967a12e35175c899fe67374d2723efdada0dcac02cf5951252992f08",
+    "README.md": "982a12442446e837e398d12bae65a5018aba31829da239839058add582d9c509",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/cardActions.js": "758ed5bdfae583d741cacb1b674b3789cc29f9803836ddfb04e7e3c7be8a5357",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/desklet.js": "20dfe3e22462f1db5056ec5aa80a232203ba694ef04ae26fa2a099c67bde4d65",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/icon.png": "9a24b9661cea8ef43931aa7d38fc26e16ee07af0051cfd71d7a1ae787347cc38",
@@ -20,7 +20,7 @@
   "schema": 1,
   "source_directory": "cinnamon-color-timer-clock-desklet@curbsoftware",
   "source_repository": "CurbSoftware/cinnamon-monorepo",
-  "source_revision": "8b66331a80bbc383578a82a628ec3689570ef93c",
+  "source_revision": "450936c0e5552812d9df7a67818dd039e7b6f4fb",
   "source_worktree_dirty": false,
   "spice": {
     "alias": "color-clock",
