@@ -65,45 +65,46 @@
     color: inherit;
 }
 
-/* Controls pill is a FIXED dark chip, independent of the schedule colour,
- * so the white symbolic icons stay legible on any card background. */
+/* Controls sit on the shared footer; no second opaque pill. */
 .ctc-card-controls {
-    background-color: rgba(10, 14, 18, 0.74);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    padding: 3px 1px;
+    padding: 0;
     spacing: 2px;
 }
 
-.ctc-card-controls-spacer {
-    min-width: 72px;
-    min-height: 36px;
+.ctc-card-aux {
+    spacing: 2px;
+}
+
+.ctc-footer-host {
+    min-height: 38px;
+    margin-top: 5px;
 }
 
 .ctc-card-bottom {
     min-height: 38px;
-    margin-top: 5px;
-    padding: 3px 1px;
-    spacing: 2px;
+    padding: 3px 6px;
+    spacing: 4px;
     border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.13);
-    background-color: rgba(10, 14, 18, 0.24);
-}
-
-.ctc-next-preview {
-    spacing: 2px;
-    padding: 2px;
-    border-radius: 11px;
     border: 1px solid rgba(255, 255, 255, 0.24);
     background-color: rgba(10, 14, 18, 0.78);
     color: white;
 }
 
-.ctc-next-label {
-    min-width: 25px;
+.ctc-swatch {
+    width: 28px;
+    height: 28px;
+}
+
+.ctc-next-icon {
     color: inherit;
-    font-size: 8.5pt;
-    font-weight: 600;
+}
+
+.ctc-next-label {
+    min-width: 0;
+    color: inherit;
+    font-size: 14pt;
+    font-weight: 700;
+    text-align: center;
 }
 
 .ctc-ctl {
@@ -139,6 +140,33 @@
     padding: 0 3px;
 }
 
+.ctc-ctl-text {
+    min-width: 28px;
+    padding: 0 4px;
+    font-weight: 600;
+}
+
+.ctc-ctl.ctc-adjust {
+    color: inherit;
+    font-size: 13pt;
+    font-weight: 700;
+    min-width: 0;
+    min-height: 0;
+    padding: 0 1px;
+}
+
+.ctc-ctl.ctc-adjust:dim {
+    color: inherit;
+    opacity: 0.45;
+}
+
+.ctc-adjust-sep {
+    color: inherit;
+    font-size: 13pt;
+    font-weight: 700;
+    padding: 0 6px;
+}
+
 .ctc-empty-container {
     min-width: 260px;
     min-height: 150px;
@@ -172,20 +200,16 @@
     padding: 3px 5px;
 }
 
-.ctc-compact .ctc-card-controls {
-    padding: 2px 1px;
+.ctc-compact .ctc-footer-host {
+    min-height: 36px;
+    margin-top: 2px;
 }
 
 .ctc-compact .ctc-card-bottom {
     min-height: 36px;
-    margin-top: 2px;
-    padding: 2px;
+    padding: 2px 4px;
 }
 
 .ctc-compact .ctc-card-content {
     spacing: 3px;
-}
-
-.ctc-compact .ctc-next-preview {
-    padding: 1px 3px;
 }

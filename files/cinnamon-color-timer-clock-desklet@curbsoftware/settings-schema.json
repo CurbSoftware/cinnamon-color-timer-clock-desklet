@@ -70,7 +70,7 @@
     "step": 1,
     "units": "min",
     "description": "Timer minutes",
-    "tooltip": "Default timer duration. The +/- buttons on the card adjust it by one minute while the timer is stopped.",
+    "tooltip": "Default timer duration. Hour, minute and second buttons on the card change it while the timer is stopped.",
     "dependency": "show-timer"
   },
   "timer-seconds": {
@@ -221,6 +221,12 @@
     "units": "px",
     "description": "Minimum desklet height",
     "tooltip": "Wrapped layouts grow taller when needed so card text and controls do not overlap"
+  },
+  "show-next-bar": {
+    "type": "checkbox",
+    "default": true,
+    "description": "Show next color countdown",
+    "tooltip": "Footer clock until the next scheduled color, with a color sample. Timer and chronometer controls stay visible either way."
   },
 
   "reset-schedules": {

@@ -8,113 +8,134 @@ msgstr ""
 "Project-Id-Version: cinnamon-color-timer-clock-desklet@curbsoftware 1.7.0\n"
 "Report-Msgid-Bugs-To: https://github.com/linuxmint/cinnamon-spices-desklets/"
 "issues\n"
-"POT-Creation-Date: 2026-08-26 19:25-0700\n"
-"PO-Revision-Date: \n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"POT-Creation-Date: 2026-09-02 15:03-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#. desklet.js:84
+#: desklet.js:84
 msgid "Clock"
 msgstr ""
 
-#. desklet.js:85 desklet.js:516
+#: desklet.js:85 desklet.js:662
 msgid "Timer"
 msgstr ""
 
-#. desklet.js:86
+#: desklet.js:86
 msgid "Chronometer"
 msgstr ""
 
-#. desklet.js:254
-msgid "Next"
-msgstr ""
-
-#. desklet.js:302 desklet.js:367 desklet.js:369
+#: desklet.js:343 desklet.js:488 desklet.js:490
 msgid "Start"
 msgstr ""
 
-#. desklet.js:305
+#: desklet.js:345
 msgid "Reset"
 msgstr ""
 
-#. desklet.js:308
+#: desklet.js:349
+msgid "-1 hour"
+msgstr ""
+
+#: desklet.js:350
 msgid "-1 minute"
 msgstr ""
 
-#. desklet.js:309
+#: desklet.js:351
+msgid "-1 second"
+msgstr ""
+
+#: desklet.js:359
+msgid "+1 second"
+msgstr ""
+
+#: desklet.js:360
 msgid "+1 minute"
 msgstr ""
 
-#. desklet.js:367 desklet.js:369
+#: desklet.js:361
+msgid "+1 hour"
+msgstr ""
+
+#: desklet.js:366 desklet.js:373 desklet.js:374
+msgid "Lap"
+msgstr ""
+
+#: desklet.js:488 desklet.js:490
 msgid "Pause"
 msgstr ""
 
-#. desklet.js:442
+#: desklet.js:603
 #, javascript-format
 msgid "Next color at %s: %s"
 msgstr ""
 
-#. desklet.js:444
+#: desklet.js:605
 #, javascript-format
 msgid "Next color at %s remaining: %s"
 msgstr ""
 
-#. desklet.js:447
+#: desklet.js:608
 #, javascript-format
 msgid "Next color at %s elapsed: %s"
 msgstr ""
 
-#. desklet.js:511
+#: desklet.js:657
 msgid "Time is up"
 msgstr ""
 
-#. desklet.js:520
+#: desklet.js:666
 msgid "Ready"
 msgstr ""
 
-#. desklet.js:521
+#: desklet.js:667
 msgid "Paused"
 msgstr ""
 
+#: desklet.js:676
+#, javascript-format
+msgid "Lap %s  %s"
+msgstr ""
+
 #. metadata.json->name
-#. desklet.js:708
+#: desklet.js:867
 msgid "Color Timer Clock"
 msgstr ""
 
-#. desklet.js:709
+#: desklet.js:868
 msgid "Reload color schedules"
 msgstr ""
 
-#. desklet.js:946
+#: desklet.js:1105
 msgid "No cards enabled"
 msgstr ""
 
-#. desklet.js:950
+#: desklet.js:1109
 msgid "Right-click and choose Configure to show a card."
 msgstr ""
 
-#. desklet.js:959
+#: desklet.js:1118
 msgid "No cards enabled. Open Configure to show a card."
 msgstr ""
 
-#. desklet.js:1109
+#: desklet.js:1269
 msgid "Timer finished"
 msgstr ""
 
-#. desklet.js:1109
+#: desklet.js:1269
 msgid "The timer reached zero."
 msgstr ""
 
-#. desklet.js:1136
+#: desklet.js:1296
 #, javascript-format
 msgid "It is now %s."
 msgstr ""
 
-#. desklet.js:1138
+#: desklet.js:1298
 #, javascript-format
 msgid "Reached %s."
 msgstr ""
@@ -162,8 +183,8 @@ msgstr ""
 
 #. settings-schema.json->clock-schedule->tooltip
 msgid ""
-"Card background color at a given time of day, interpolated between stops and "
-"wrapping over midnight. Tick Notify to pop a desktop notification when the "
+"Card background color at a given time of day, interpolated between stops and"
+" wrapping over midnight. Tick Notify to pop a desktop notification when the "
 "clock reaches that time. Colors: hex (#rgb, #rgba, #rrggbb or #rrggbbaa) or "
 "a name: black, white, red, orange, yellow, lime, green, teal, cyan, blue, "
 "purple, magenta, grey."
@@ -216,8 +237,8 @@ msgstr ""
 
 #. settings-schema.json->timer-minutes->tooltip
 msgid ""
-"Default timer duration. The +/- buttons on the card adjust it by one minute "
-"while the timer is stopped."
+"Default timer duration. Hour, minute and second buttons on the card change "
+"it while the timer is stopped."
 msgstr ""
 
 #. settings-schema.json->timer-seconds->units
@@ -271,8 +292,8 @@ msgstr ""
 
 #. settings-schema.json->chrono-milliseconds->tooltip
 msgid ""
-"Adds a .ss fraction to the chronometer. The card updates 20 times per second "
-"while it runs; paused it freezes the fraction, stopped it reads 00:00.00."
+"Adds a .ss fraction to the chronometer. The card updates 20 times per second"
+" while it runs; paused it freezes the fraction, stopped it reads 00:00.00."
 msgstr ""
 
 #. settings-schema.json->display->description
@@ -355,6 +376,16 @@ msgstr ""
 msgid ""
 "Wrapped layouts grow taller when needed so card text and controls do not "
 "overlap"
+msgstr ""
+
+#. settings-schema.json->show-next-bar->description
+msgid "Show next color countdown"
+msgstr ""
+
+#. settings-schema.json->show-next-bar->tooltip
+msgid ""
+"Footer clock until the next scheduled color, with a color sample. Timer and "
+"chronometer controls stay visible either way."
 msgstr ""
 
 #. settings-schema.json->reset-schedules->description

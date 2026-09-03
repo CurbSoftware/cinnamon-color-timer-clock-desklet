@@ -120,6 +120,27 @@ function _formatDuration(ms, ceil, hundredths) {
     return out;
 }
 
+/* Footer countdown: always HH:MM:SS, never hundredths. */
+function _formatClock(ms, ceil) {
+    const total = Math.max(0, Number(ms) || 0);
+    const secs = ceil ? Math.ceil(total / 1000) : Math.floor(total / 1000);
+    const h = Math.floor(secs / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    return (h < 100 ? _pad2(h) : String(h)) + ":" + _pad2(m) + ":" + _pad2(s);
+}
+
+const SWATCH_PX = 28;
+const SWATCH_HALF = 14;
+const TIMER_ADJUST = {
+    "minus-hour": -3600,
+    "minus-minute": -60,
+    "minus-second": -1,
+    "plus-hour": 3600,
+    "plus-minute": 60,
+    "plus-second": 1
+};
+
 function _centerLabelText(label) {
     if (!label || !label.clutter_text)
         return;
@@ -151,7 +172,7 @@ function _responsiveHeight(rows, height, spacing) {
     const count = Math.max(1, parseInt(rows, 10) || 1);
     const base = Number(height) > 0 ? Number(height) : 260;
     const gap = Math.max(0, Number(spacing) || 0);
-    return Math.max(base, count * (124 + 2 * gap) + 8);
+    return Math.max(base, count * (156 + 2 * gap) + 8);
 }
 
 function _nextScheduleStop(stops, pos, opts) {
@@ -180,6 +201,27 @@ function _nextScheduleStop(stops, pos, opts) {
             return { t: list[i].t, rgba: list[i].rgba.slice() };
     }
     return opts.wrap ? { t: list[0].t, rgba: list[0].rgba.slice() } : null;
+}
+
+function _secondsUntilStop(pos, nextT, opts) {
+    if (CardActions && typeof CardActions.secondsUntilStop === "function")
+        return CardActions.secondsUntilStop(pos, nextT, opts);
+    opts = opts || {};
+    let q = Number(pos);
+    let t = Number(nextT);
+    if (!Number.isFinite(q) || !Number.isFinite(t))
+        return null;
+    if (opts.reverse) {
+        let d = q - t;
+        return d > 0 ? d : null;
+    }
+    if (opts.wrap) {
+        q = ((q % 86400) + 86400) % 86400;
+        t = ((t % 86400) + 86400) % 86400;
+        return ((t - q) % 86400 + 86400) % 86400;
+    }
+    let d = t - q;
+    return d > 0 ? d : null;
 }
 
 function CardWidget(kind, desklet) {
@@ -232,6 +274,13 @@ CardWidget.prototype = {
         });
         this._body.add(this._value, { x_fill: false, x_align: St.Align.MIDDLE });
         this._body.add(this._sub, { x_fill: false, x_align: St.Align.MIDDLE });
+        if (kind !== "clock") {
+            this._aux = new St.BoxLayout({ style_class: "ctc-card-aux" });
+            this._body.add(this._aux, {
+                x_fill: false,
+                x_align: St.Align.MIDDLE
+            });
+        }
         this._content.add(this._body, {
             x_fill: true,
             x_align: St.Align.MIDDLE
@@ -244,32 +293,42 @@ CardWidget.prototype = {
             y_align: St.Align.MIDDLE
         });
 
+        this._swatchBox = new St.Widget({
+            style_class: "ctc-swatch",
+            layout_manager: new Clutter.BinLayout(),
+            reactive: true
+        });
+        this._swatchBox.set_width(SWATCH_PX);
+        this._swatchBox.set_height(SWATCH_PX);
         this._swatch = new St.DrawingArea({ reactive: true });
-        this._swatch.set_width(20);
-        this._swatch.set_height(20);
+        this._swatch.set_width(SWATCH_PX);
+        this._swatch.set_height(SWATCH_PX);
+        this._swatch.x_align = Clutter.ActorAlign.FILL;
+        this._swatch.y_align = Clutter.ActorAlign.FILL;
         this._swatchColor = null;
         this._swatch.connect("repaint", () => this._paintSwatch());
-        this._swatchTooltip = new Tooltips.Tooltip(this._swatch, "");
-        this._nextLabel = new St.Label({
-            text: _("Next"),
+        this._nextIcon = new St.Icon({
+            icon_name: "go-next-symbolic",
+            icon_type: St.IconType.SYMBOLIC,
+            icon_size: 14,
+            style_class: "ctc-next-icon",
+            reactive: false
+        });
+        this._nextIcon.x_align = Clutter.ActorAlign.CENTER;
+        this._nextIcon.y_align = Clutter.ActorAlign.CENTER;
+        this._swatchBox.add_child(this._swatch);
+        this._swatchBox.add_child(this._nextIcon);
+        this._swatchTooltip = new Tooltips.Tooltip(this._swatchBox, "");
+        this._nextText = new St.Label({
             style_class: "ctc-next-label",
             reactive: false
         });
-        this._nextPreview = new St.BoxLayout({
-            style_class: "ctc-next-preview",
-            reactive: false
-        });
-        this._nextPreview.add(this._nextLabel, {
-            x_fill: false,
-            x_align: St.Align.MIDDLE,
-            y_align: St.Align.MIDDLE
-        });
-        this._nextPreview.add(this._swatch, {
-            x_fill: false,
-            y_fill: false,
-            x_align: St.Align.END,
-            y_align: St.Align.MIDDLE
-        });
+        try {
+            this._nextText.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
+            this._nextText.clutter_text.line_wrap = false;
+            this._nextText.clutter_text.set_font_name("Monospace Bold 14");
+        } catch (e) {}
+        _centerLabelText(this._nextText);
         this._buildControls();
 
         /* The card's whole inline style (margin + colours + transition) is
@@ -284,58 +343,141 @@ CardWidget.prototype = {
     },
 
     _buildControls: function () {
-        /* Fixed dark pill so the white symbolic icons stay legible whatever
-         * colour the schedule paints the card. Plain St.Buttons on the card
-         * itself - no PopupMenu, so no grab/teardown bug class and no need
-         * to defer the handlers. Tooltips self-destroy with their button. */
+        /* Play/reset stay on the footer. Timer h/m/s and chrono lap live on
+         * the card body. Plain St.Buttons, no PopupMenu. */
         this._ctlButtons = [];
+        this._adjustButtons = [];
+        this._controls = null;
+        this._lapButton = null;
 
-        if (this.kind === "clock") {
-            this._controls = new St.Bin({
-                style_class: "ctc-card-controls-spacer",
-                reactive: false,
-                can_focus: false
-            });
-        } else {
+        if (this.kind !== "clock") {
             this._controls = new St.BoxLayout({ style_class: "ctc-card-controls" });
-
             this._playButton = this._ctlButton("media-playback-start", "toggle", false, _("Start"));
             this._controls.add(this._playButton);
-
             this._controls.add(this._ctlButton("view-refresh", "reset", false, _("Reset")));
-
-            if (this.kind === "timer") {
-                this._minusButton = this._ctlButton("list-remove", "minus", true, _("-1 minute"));
-                this._plusButton = this._ctlButton("list-add", "plus", true, _("+1 minute"));
-                this._controls.add(this._minusButton);
-                this._controls.add(this._plusButton);
-            }
         }
 
-        /* Every card shares one intentional footer: controls stay centered
-         * and the labelled next-colour chip always lands at bottom-right. */
-        const bottom = new St.BoxLayout({ style_class: "ctc-card-bottom" });
-        bottom.add(this._controls, { expand: true, x_fill: false, x_align: St.Align.MIDDLE });
-        bottom.add(this._nextPreview, {
-            x_fill: false,
-            x_align: St.Align.END,
+        if (this.kind === "timer" && this._aux) {
+            this._aux.add(this._ctlButton(null, "minus-hour", true, _("-1 hour"), true, "-h"));
+            this._aux.add(this._ctlButton(null, "minus-minute", true, _("-1 minute"), true, "-m"));
+            this._aux.add(this._ctlButton(null, "minus-second", true, _("-1 second"), true, "-s"));
+            this._aux.add(new St.Label({
+                text: "|",
+                style_class: "ctc-adjust-sep"
+            }), { y_align: St.Align.MIDDLE });
+            this._aux.add(this._ctlButton(null, "plus-second", true, _("+1 second"), true, "+s"));
+            this._aux.add(this._ctlButton(null, "plus-minute", true, _("+1 minute"), true, "+m"));
+            this._aux.add(this._ctlButton(null, "plus-hour", true, _("+1 hour"), true, "+h"));
+        } else if (this.kind === "chrono" && this._aux) {
+            this._lapButton = new St.Button({
+                style_class: "ctc-ctl ctc-ctl-text ctc-adjust",
+                can_focus: true,
+                label: _("Lap")
+            });
+            this._ctlButtons.push(this._lapButton);
+            this._lapButton.connect("clicked", () => {
+                this.desklet._onControl(this.kind, "lap");
+            });
+            if (this._lapButton.set_accessible_name)
+                this._lapButton.set_accessible_name(_("Lap"));
+            new Tooltips.Tooltip(this._lapButton, _("Lap"));
+            this._aux.add(this._lapButton, { y_align: St.Align.MIDDLE });
+        }
+
+        this._bottom = new St.BoxLayout({ style_class: "ctc-card-bottom" });
+        if (this._controls) {
+            this._bottom.add(this._controls, {
+                x_fill: false,
+                y_fill: false,
+                x_align: St.Align.START,
+                y_align: St.Align.MIDDLE
+            });
+        }
+        this._bottom.add(this._nextText, {
+            expand: true,
+            x_expand: true,
+            x_fill: true,
+            y_fill: false,
+            x_align: St.Align.MIDDLE,
             y_align: St.Align.MIDDLE
         });
-        this.actor.add(bottom, { x_fill: true, y_fill: false, x_align: St.Align.MIDDLE, y_align: St.Align.END });
+        if (this._nextText.set_x_expand)
+            this._nextText.set_x_expand(true);
+
+        this._footerHost = new St.Widget({
+            style_class: "ctc-footer-host",
+            layout_manager: new Clutter.BinLayout(),
+            x_expand: true
+        });
+        this._bottom.x_expand = true;
+        this._bottom.x_align = Clutter.ActorAlign.FILL;
+        this._bottom.y_expand = false;
+        this._bottom.y_align = Clutter.ActorAlign.CENTER;
+        this._footerHost.add_child(this._bottom);
+        this._swatchBox.x_align = Clutter.ActorAlign.END;
+        this._swatchBox.y_align = Clutter.ActorAlign.CENTER;
+        this._footerHost.add_child(this._swatchBox);
+        this._bottom.set_height(38);
+        this._footerHost.set_height(38);
+        this._nextText.y_align = Clutter.ActorAlign.CENTER;
+        this._nextText.y_expand = false;
+        this._footerHost.connect("notify::width", () => this._syncSwatchLayout());
+        this._footerHost.connect("notify::height", () => this._syncSwatchLayout());
+        this.actor.add(this._footerHost, {
+            x_fill: true,
+            y_fill: false,
+            x_align: St.Align.MIDDLE,
+            y_align: St.Align.END
+        });
     },
 
-    _ctlButton: function (iconName, action, small, tipText) {
-        const icon = new St.Icon({
-            icon_name: iconName,
-            icon_type: St.IconType.SYMBOLIC,
-            icon_size: 16
-        });
-        const button = new St.Button({
-            style_class: small ? "ctc-ctl ctc-ctl-small" : "ctc-ctl",
+    _syncSwatchLayout: function () {
+        if (!this._bottom || !this._footerHost || !this._swatchBox)
+            return;
+        const show = !!(this._swatchBox.visible);
+        const style = show ? "margin-right: " + SWATCH_HALF + "px;" : "";
+        if (this._bottomStyle !== style) {
+            this._bottomStyle = style;
+            this._bottom.set_style(style);
+        }
+        const hostW = this._footerHost.get_width();
+        const hostH = this._footerHost.get_height();
+        if (!(hostW > 0) || !(hostH > 0))
+            return;
+        if (show) {
+            this._swatchBox.set_position(
+                hostW - SWATCH_PX,
+                Math.round((hostH - SWATCH_PX) / 2)
+            );
+        }
+    },
+
+    _ctlButton: function (iconName, action, small, tipText, adjust, labelText) {
+        let klass = small ? "ctc-ctl ctc-ctl-small" : "ctc-ctl";
+        if (labelText)
+            klass += " ctc-ctl-text";
+        if (adjust)
+            klass += " ctc-adjust";
+        const props = {
+            style_class: klass,
             can_focus: true
-        });
+        };
+        if (labelText)
+            props.label = labelText;
+        const button = new St.Button(props);
         this._ctlButtons.push(button);
-        button.set_child(icon);
+        if (adjust)
+            this._adjustButtons.push(button);
+        if (!labelText) {
+            const icon = new St.Icon({
+                icon_name: iconName,
+                icon_type: St.IconType.SYMBOLIC,
+                icon_size: 16
+            });
+            button.set_child(icon);
+            if (iconName === "media-playback-start")
+                this._playIcon = icon;
+        }
         button.connect("clicked", () => {
             this.desklet._onControl(this.kind, action);
         });
@@ -346,8 +488,6 @@ CardWidget.prototype = {
             if (iconName === "media-playback-start")
                 this._playTooltip = tip;
         }
-        if (iconName === "media-playback-start")
-            this._playIcon = icon;
         return button;
     },
 
@@ -374,9 +514,7 @@ CardWidget.prototype = {
      * needs a reset first. They stay mounted but dim and inert, so the
      * pill keeps one width in every state. */
     setAdjustVisible: function (visible) {
-        if (!this._minusButton || !this._plusButton)
-            return;
-        const buttons = [this._minusButton, this._plusButton];
+        const buttons = this._adjustButtons || [];
         for (let i = 0; i < buttons.length; i++) {
             buttons[i].reactive = visible;
             buttons[i].can_focus = visible;
@@ -385,6 +523,17 @@ CardWidget.prototype = {
             else
                 buttons[i].add_style_pseudo_class("dim");
         }
+    },
+
+    setLapEnabled: function (enabled) {
+        if (!this._lapButton)
+            return;
+        this._lapButton.reactive = enabled;
+        this._lapButton.can_focus = enabled;
+        if (enabled)
+            this._lapButton.remove_style_pseudo_class("dim");
+        else
+            this._lapButton.add_style_pseudo_class("dim");
     },
 
     /* Expiry joins the inline style (a high-contrast ring in the fg colour)
@@ -411,8 +560,9 @@ CardWidget.prototype = {
      * @smooth (boolean): animate towards this colour over 1000 ms
      * @nextStop (object): the next {t, rgba} schedule stop, or null when no
      *   stop remains in the direction of travel
+     * @pos (number): this card's schedule position in seconds
      */
-    update: function (now, rgba, smooth, nextStop) {
+    update: function (now, rgba, smooth, nextStop, pos) {
         if (this.kind === "clock")
             this._updateClock(now);
         else if (this.kind === "timer")
@@ -420,19 +570,49 @@ CardWidget.prototype = {
         else
             this._updateChrono(now);
         this._applyColors(rgba, smooth);
-        this._updateSwatch(nextStop);
+        this._updateNextBar(nextStop, pos);
     },
 
-    /* Solid next-colour preview. Tooltip identifies exact stop and colour. */
-    _updateSwatch: function (nextStop) {
-        if (!this._swatch)
-            return;
-        if (!nextStop || !Array.isArray(nextStop.rgba)) {
-            this._nextPreview.hide();
-            return;
+    /* Footer clock plus next-colour icon and overlay swatch. */
+    _updateNextBar: function (nextStop, pos) {
+        const showBar = this.desklet.showNextBar !== false;
+        const hasNext = !!(nextStop && Array.isArray(nextStop.rgba));
+        const showInfo = showBar && hasNext;
+
+        if (this._nextText) {
+            if (showInfo)
+                this._nextText.show();
+            else
+                this._nextText.hide();
         }
-        this._nextPreview.show();
-        this._swatch.show();
+        if (this._swatchBox) {
+            if (showInfo)
+                this._swatchBox.show();
+            else
+                this._swatchBox.hide();
+        }
+        if (this._swatch) {
+            if (showInfo)
+                this._swatch.show();
+            else
+                this._swatch.hide();
+        }
+        if (this._footerHost) {
+            if (this.kind === "clock" && !showInfo)
+                this._footerHost.hide();
+            else
+                this._footerHost.show();
+        }
+        this._syncSwatchLayout();
+        if (!showInfo)
+            return;
+
+        const opts = this.kind === "clock" ? { wrap: true } :
+            this.kind === "timer" ? { reverse: true } : {};
+        const until = _secondsUntilStop(pos, nextStop.t, opts);
+        if (this._nextText)
+            this._nextText.set_text(_formatClock((Number(until) > 0 ? until : 0) * 1000, true));
+
         this._swatchColor = nextStop.rgba;
         const color = CardActions.rgbaToKey(nextStop.rgba);
         let text;
@@ -449,45 +629,37 @@ CardWidget.prototype = {
         }
         if (this._swatchTooltip && this._swatchTooltip.set_text)
             this._swatchTooltip.set_text(text);
-        if (this._swatch.set_accessible_name)
+        if (this._swatchBox && this._swatchBox.set_accessible_name)
+            this._swatchBox.set_accessible_name(text);
+        if (this._swatch && this._swatch.set_accessible_name)
             this._swatch.set_accessible_name(text);
+        if (this._nextIcon && CardActions && CardActions.contrastColors) {
+            const fg = CardActions.contrastColors(nextStop.rgba).fg;
+            this._nextIcon.set_style("color: " + CardActions.rgbaToCss(fg) + ";");
+        }
         this._swatch.queue_repaint();
     },
 
-    /* Draw the swatch circle directly (a St.DrawingArea paints only what this
-     * callback draws, so the size and fill do not depend on CSS background). */
     _paintSwatch: function () {
         const area = this._swatch;
         const cr = area.get_context();
         if (!cr)
             return;
         const [w, h] = area.get_surface_size();
-        const r = Math.min(w, h) / 2 - 1;
-        const cx = w / 2;
-        const cy = h / 2;
-
         cr.setSourceRGBA(0, 0, 0, 0);
         cr.rectangle(0, 0, w, h);
         cr.fill();
-
         const c = this._swatchColor;
         if (c) {
             cr.setSourceRGBA(c[0] / 255, c[1] / 255, c[2] / 255, c[3]);
-            cr.arc(cx, cy, Math.max(1, r - 2.5), 0, 2 * Math.PI);
+            cr.rectangle(0, 0, w, h);
             cr.fill();
-
-            /* A dark outer ring and bright inner ring keep the chip crisp on
-             * both pale and dark schedule colours. */
-            cr.setSourceRGBA(0, 0, 0, 0.78);
-            cr.setLineWidth(2);
-            cr.arc(cx, cy, r, 0, 2 * Math.PI);
-            cr.stroke();
-            cr.setSourceRGBA(1, 1, 1, 0.88);
-            cr.setLineWidth(1.5);
-            cr.arc(cx, cy, Math.max(1, r - 2), 0, 2 * Math.PI);
-            cr.stroke();
         }
-
+        /* Same paint as .ctc-card-bottom background. */
+        cr.setSourceRGBA(10 / 255, 14 / 255, 18 / 255, 0.78);
+        cr.setLineWidth(1);
+        cr.rectangle(0.5, 0.5, Math.max(0, w - 1), Math.max(0, h - 1));
+        cr.stroke();
         cr.$dispose();
     },
 
@@ -525,7 +697,14 @@ CardWidget.prototype = {
         this._value.set_text(_formatDuration(
             this.desklet._chronoElapsedMs(now.getTime()), false,
             this.desklet.chronoMilliseconds));
-        this._sub.set_text("");
+        const lap = this.desklet._chronoLap;
+        if (lap && lap.count > 0) {
+            this._sub.set_text(_("Lap %s  %s").format(
+                String(lap.count),
+                _formatDuration(lap.lastMs, false, this.desklet.chronoMilliseconds)));
+        } else {
+            this._sub.set_text("");
+        }
     },
 
     /* One cached set_style per colour change: the 1 s tick samples a linear
@@ -594,9 +773,9 @@ CardWidget.prototype = {
     },
 
     _setFontSizes: function (sizes) {
-        this._value.set_style("font-size: " + sizes.time + "pt;");
-        this._sub.set_style("font-size: " + sizes.date + "pt;");
-        this._title.set_style("font-size: " + sizes.timezone + "pt;");
+        this._value.set_style("font-size: " + sizes.time + "pt; color: inherit;");
+        this._sub.set_style("font-size: " + sizes.date + "pt; color: inherit;");
+        this._title.set_style("font-size: " + sizes.timezone + "pt; color: inherit;");
     },
 
     _constrainTitleWidth: function (width) {
@@ -620,9 +799,11 @@ CardWidget.prototype = {
                 const valueH = this._value.get_preferred_height(-1)[1];
                 const subH = this._sub.get_preferred_height(-1)[1];
                 const titleH = this._title.get_preferred_height(-1)[1];
-                const pillH = this._controls
-                    ? this._controls.get_preferred_height(-1)[1] : 0;
-                const totalH = valueH + subH + titleH + pillH + 2 * gap;
+                const auxH = this._aux
+                    ? this._aux.get_preferred_height(-1)[1] : 0;
+                const pillH = (this._footerHost && this._footerHost.visible)
+                    ? this._footerHost.get_preferred_height(-1)[1] : 0;
+                const totalH = valueH + subH + titleH + auxH + pillH + 2 * gap;
                 const wide = valueW > inner.width + 1 || subW > inner.width + 1;
                 const tall = totalH > inner.height + 1;
                 if (!wide && !tall)
@@ -655,6 +836,7 @@ MyDesklet.prototype = {
         this.settings.bind("show-clock", "showClock", this.on_setting_changed);
         this.settings.bind("show-timer", "showTimer", this.on_setting_changed);
         this.settings.bind("show-chronometer", "showChronometer", this.on_setting_changed);
+        this.settings.bind("show-next-bar", "showNextBar", this.on_setting_changed);
         this._watchStringSetting("clock-timezone", "clockTimezone", this.on_setting_changed);
         this.settings.bind("clock-schedule", "clockSchedule", this.on_setting_changed);
         this.settings.bind("clock-smooth", "clockSmooth", this.on_setting_changed);
@@ -1088,6 +1270,7 @@ MyDesklet.prototype = {
             }
             : { phase: "stopped", startMs: 0, accumMs: 0 };
         this._chrono = c;
+        this._chronoLap = { count: 0, lastMs: 0 };
         this._persistChrono();
     },
 
@@ -1217,11 +1400,10 @@ MyDesklet.prototype = {
             t.durationSec = this._timerDurationFromSettings();
             t.endMs = 0;
             t.remainingMs = 0;
-        } else if (action === "minus" || action === "plus") {
+        } else if (TIMER_ADJUST[action] !== undefined) {
             if (t.phase !== "stopped")
                 return;
-            const delta = action === "plus" ? 60 : -60;
-            t.durationSec = Math.max(1, Math.min(86400, t.durationSec + delta));
+            t.durationSec = Math.max(1, Math.min(86400, t.durationSec + TIMER_ADJUST[action]));
         } else {
             return;
         }
@@ -1239,8 +1421,10 @@ MyDesklet.prototype = {
                 c.accumMs += now - c.startMs;
                 c.phase = "paused";
             } else {
-                if (c.phase === "stopped")
+                if (c.phase === "stopped") {
                     c.accumMs = 0;
+                    this._chronoLap = { count: 0, lastMs: 0 };
+                }
                 /* Resume resets startMs and keeps the accumulated total. */
                 c.startMs = now;
                 c.phase = "running";
@@ -1249,6 +1433,15 @@ MyDesklet.prototype = {
             c.phase = "stopped";
             c.startMs = 0;
             c.accumMs = 0;
+            this._chronoLap = { count: 0, lastMs: 0 };
+        } else if (action === "lap") {
+            if (c.phase !== "running")
+                return;
+            if (!this._chronoLap)
+                this._chronoLap = { count: 0, lastMs: 0 };
+            this._chronoLap.count++;
+            this._chronoLap.lastMs = this._chronoElapsedMs(now);
+            return;
         } else {
             return;
         }
@@ -1330,21 +1523,21 @@ MyDesklet.prototype = {
                     smooth: smooth
                 });
                 nextStop = _nextScheduleStop(this._schedules.clock, pos, { wrap: true });
-                widget.update(now, rgba, smooth, nextStop);
+                widget.update(now, rgba, smooth, nextStop, pos);
             } else if (widget.kind === "timer") {
                 pos = this._timerRemainingMs(nowMs) / 1000;
                 rgba = CardActions.evaluate(this._schedules.timer, pos, {
                     smooth: smooth
                 });
                 nextStop = _nextScheduleStop(this._schedules.timer, pos, { reverse: true });
-                widget.update(now, rgba, smooth, nextStop);
+                widget.update(now, rgba, smooth, nextStop, pos);
             } else {
                 pos = this._chronoElapsedMs(nowMs) / 1000;
                 rgba = CardActions.evaluate(this._schedules.chrono, pos, {
                     smooth: smooth
                 });
                 nextStop = _nextScheduleStop(this._schedules.chrono, pos, {});
-                widget.update(now, rgba, smooth, nextStop);
+                widget.update(now, rgba, smooth, nextStop, pos);
             }
             this._checkNotifyCrossing(widget.kind, pos);
         }
@@ -1376,6 +1569,7 @@ MyDesklet.prototype = {
                 widget.setExpired(this._timer.phase === "expired");
             } else if (widget.kind === "chrono") {
                 widget.setPlaying(this._chrono.phase === "running");
+                widget.setLapEnabled(this._chrono.phase === "running");
                 widget.setExpired(false);
             }
         }

@@ -27,14 +27,14 @@ One glance tells me the state of things. That's the whole idea.
 - Up to three responsive cards. Narrow widths wrap cards onto centered rows and add enough height instead of hiding or clipping cards
 - Per-card color schedules with smooth (interpolated) or stepped transitions
 - Clock card with an optional IANA timezone
-- Timer with on-card play/pause, reset and ±60 s buttons; survives restarts and expires correctly even after downtime
+- Timer with on-card play/pause, reset and hour/minute/second buttons under Ready; survives restarts and expires correctly even after downtime
 - Optional desktop notification when the timer finishes
 - Optional notifications when the clock or chronometer reaches a schedule stop
-- Chronometer with pause/resume; the accumulated time survives restarts, and an optional hundredths display (20 updates/s while running)
+- Chronometer with pause/resume and a Lap button on the card; the accumulated time survives restarts, and an optional hundredths display (20 updates/s while running)
 - Text and border colors adapt to the card background for readability (WCAG contrast ratio)
 - Keyboard focus, pressed states, accessible names and tooltips on every card control
 - One **Reload color schedules** desklet menu action that does not interrupt a running timer or chronometer
-- A labelled **Next** preview chip on each card, with a 20 px double-ring colour sample and the upcoming stop details in its tooltip
+- A footer clock on each card (`HH:MM:SS` until the next colour, with a 28 px colour sample that carries the go-next icon). Hide it from Display settings; timer and chronometer play/reset stay
 - A clear setup message when every card is disabled
 - One-click "Reset all schedules to defaults"
 
@@ -48,7 +48,7 @@ Right-click the desklet and choose **Configure**.
 - **Notify (per schedule row)**: tick a clock or chronometer schedule row's Notify checkbox to pop a notification when that time is reached
 - **Timer minutes / seconds**: the default duration the timer restarts from
 - **Reload color schedules**: the desklet menu action reloads all three schedules without restarting a running timer or chronometer
-- **Next colour (per card)**: the labelled footer chip previews the next schedule colour. Hover its colour sample for the stop time and exact colour value
+- **Show next color countdown**: footer clock until the next scheduled colour, with a colour sample. Timer and chronometer controls stay visible either way
 - **Show hundredths of a second**: adds a `.ss` fraction to the chronometer while it runs
 - **Time / date format**: `strftime` patterns for the clock card
 - **Maximum font sizes, card spacing, desklet width / height**: cards shrink text to fit

@@ -309,6 +309,35 @@ function nextStop(stops, pos, opts) {
     return null;
 }
 
+/**
+ * secondsUntilStop:
+ * @pos (number): current position in seconds
+ * @nextT (number): upcoming stop time in seconds
+ * @opts (object): { wrap, reverse } matching nextStop()
+ *
+ * Returns (number): seconds until that stop in the direction of travel, or
+ * null when the stop is not ahead. Wrapped clocks always get a non-negative
+ * delta (0 when pos lands on nextT).
+ */
+function secondsUntilStop(pos, nextT, opts) {
+    opts = opts || {};
+    let q = Number(pos);
+    let t = Number(nextT);
+    if (!Number.isFinite(q) || !Number.isFinite(t))
+        return null;
+    if (opts.reverse) {
+        let d = q - t;
+        return d > 0 ? d : null;
+    }
+    if (opts.wrap) {
+        q = ((q % DAY_SECONDS) + DAY_SECONDS) % DAY_SECONDS;
+        t = ((t % DAY_SECONDS) + DAY_SECONDS) % DAY_SECONDS;
+        return ((t - q) % DAY_SECONDS + DAY_SECONDS) % DAY_SECONDS;
+    }
+    let d = t - q;
+    return d > 0 ? d : null;
+}
+
 /* Compatibility helper for callers that only need the preview colour. */
 function nextColor(stops, pos, opts) {
     let stop = nextStop(stops, pos, opts);
@@ -572,10 +601,10 @@ var CARD_LAYOUT = {
     dateEm: 0.58,
     labelEm: 0.56,
     addMaxPt: 16,
-    /* Timer controls and the labelled next-colour chip share one footer. */
+    /* Timer controls and the next-colour countdown share one footer. */
     minCardWidth: 250,
-    /* Title, value, subtitle and control row need this much card height. */
-    minCardHeight: 124
+    /* Title, value, Ready/Lap row and footer clock need this much card height. */
+    minCardHeight: 156
 };
 
 /**
