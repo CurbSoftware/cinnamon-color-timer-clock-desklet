@@ -4,7 +4,7 @@
     "LICENSE": "e00989f872a62991eba15c3c920a06cb8837a00428151aebacc97464b143bdb3",
     "README.md": "dd84d0b0fb53a85cfb1ce0245a9a315528d6644d097f1e773d553ab86c81b584",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/cardActions.js": "e8f2cb2e6d610728b281feb8ab210946abe5e8deafab11263b4c6550f7bc5d7c",
-    "files/cinnamon-color-timer-clock-desklet@curbsoftware/desklet.js": "e6068edca260923ffba669bc10a6db01fa4eecc5ee508e5784a1d611aa4d3405",
+    "files/cinnamon-color-timer-clock-desklet@curbsoftware/desklet.js": "b98d57201edadbf99696e801f5f5e3148c5a304ef9be86ebe958463d4a985ab2",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/icon.png": "9a24b9661cea8ef43931aa7d38fc26e16ee07af0051cfd71d7a1ae787347cc38",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/metadata.json": "a3ac80dc2e3dc9f6052ab45764ae10c75b6b22f08263b5c7168c97d4eac4176f",
     "files/cinnamon-color-timer-clock-desklet@curbsoftware/po/cinnamon-color-timer-clock-desklet@curbsoftware.pot": "3b90cf951ddde893fffd9b72fed519d69d44f928e1c326b113f67998a1c65ffd",
@@ -20,7 +20,7 @@
   "schema": 1,
   "source_directory": "cinnamon-color-timer-clock-desklet@curbsoftware",
   "source_repository": "CurbSoftware/cinnamon-monorepo",
-  "source_revision": "356a5a118fff00b046108d9b14a0b13f70e9753e",
+  "source_revision": "47131655405abe6c93a2f4725f9afb7094acf36c",
   "source_worktree_dirty": false,
   "spice": {
     "alias": "color-clock",

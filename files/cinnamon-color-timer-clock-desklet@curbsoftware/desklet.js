@@ -131,7 +131,6 @@ function _formatClock(ms, ceil) {
 }
 
 const SWATCH_PX = 28;
-const SWATCH_HALF = 14;
 const TIMER_ADJUST = {
     "minus-hour": -3600,
     "minus-minute": -60,
@@ -384,7 +383,9 @@ CardWidget.prototype = {
             this._aux.add(this._lapButton, { y_align: St.Align.MIDDLE });
         }
 
-        this._bottom = new St.BoxLayout({ style_class: "ctc-card-bottom" });
+        this._bottom = new St.BoxLayout({
+            style_class: "ctc-card-bottom ctc-footer-host"
+        });
         if (this._controls) {
             this._bottom.add(this._controls, {
                 x_fill: false,
@@ -403,53 +404,25 @@ CardWidget.prototype = {
         });
         if (this._nextText.set_x_expand)
             this._nextText.set_x_expand(true);
-
-        this._footerHost = new St.Widget({
-            style_class: "ctc-footer-host",
-            layout_manager: new Clutter.BinLayout(),
-            x_expand: true
+        this._swatchBox.x_expand = false;
+        this._swatchBox.y_expand = false;
+        this._bottom.add(this._swatchBox, {
+            pack_start: false,
+            x_fill: false,
+            y_fill: false,
+            x_align: St.Align.END,
+            y_align: St.Align.MIDDLE
         });
-        this._bottom.x_expand = true;
-        this._bottom.x_align = Clutter.ActorAlign.FILL;
-        this._bottom.y_expand = false;
-        this._bottom.y_align = Clutter.ActorAlign.CENTER;
-        this._footerHost.add_child(this._bottom);
-        this._swatchBox.x_align = Clutter.ActorAlign.END;
-        this._swatchBox.y_align = Clutter.ActorAlign.CENTER;
-        this._footerHost.add_child(this._swatchBox);
         this._bottom.set_height(38);
-        this._footerHost.set_height(38);
         this._nextText.y_align = Clutter.ActorAlign.CENTER;
         this._nextText.y_expand = false;
-        this._footerHost.connect("notify::width", () => this._syncSwatchLayout());
-        this._footerHost.connect("notify::height", () => this._syncSwatchLayout());
+        this._footerHost = this._bottom;
         this.actor.add(this._footerHost, {
             x_fill: true,
             y_fill: false,
             x_align: St.Align.MIDDLE,
             y_align: St.Align.END
         });
-    },
-
-    _syncSwatchLayout: function () {
-        if (!this._bottom || !this._footerHost || !this._swatchBox)
-            return;
-        const show = !!(this._swatchBox.visible);
-        const style = show ? "margin-right: " + SWATCH_HALF + "px;" : "";
-        if (this._bottomStyle !== style) {
-            this._bottomStyle = style;
-            this._bottom.set_style(style);
-        }
-        const hostW = this._footerHost.get_width();
-        const hostH = this._footerHost.get_height();
-        if (!(hostW > 0) || !(hostH > 0))
-            return;
-        if (show) {
-            this._swatchBox.set_position(
-                hostW - SWATCH_PX,
-                Math.round((hostH - SWATCH_PX) / 2)
-            );
-        }
     },
 
     _ctlButton: function (iconName, action, small, tipText, adjust, labelText) {
@@ -573,7 +546,7 @@ CardWidget.prototype = {
         this._updateNextBar(nextStop, pos);
     },
 
-    /* Footer clock plus next-colour icon and overlay swatch. */
+    /* Footer clock plus next-colour icon and swatch. */
     _updateNextBar: function (nextStop, pos) {
         const showBar = this.desklet.showNextBar !== false;
         const hasNext = !!(nextStop && Array.isArray(nextStop.rgba));
@@ -603,7 +576,6 @@ CardWidget.prototype = {
             else
                 this._footerHost.show();
         }
-        this._syncSwatchLayout();
         if (!showInfo)
             return;
 
