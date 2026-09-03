@@ -60,8 +60,9 @@ No root needed. Everything installs into your home directory.
 From a release package:
 
 ```bash
-curl -fLO https://github.com/RobertAlexanderH/cinnamon-color-timer-clock-desklet/releases/latest/download/cinnamon-color-timer-clock-desklet.zip
-unzip cinnamon-color-timer-clock-desklet.zip
+curl -fLO https://github.com/CurbSoftware/cinnamon-color-timer-clock-desklet/releases/latest/download/cinnamon-color-timer-clock-desklet.zip
+unzip -o cinnamon-color-timer-clock-desklet.zip
+mkdir -p ~/.local/share/cinnamon/desklets
 rm -rf ~/.local/share/cinnamon/desklets/cinnamon-color-timer-clock-desklet@curbsoftware
 cp -r cinnamon-color-timer-clock-desklet@curbsoftware/files/cinnamon-color-timer-clock-desklet@curbsoftware \
    ~/.local/share/cinnamon/desklets/cinnamon-color-timer-clock-desklet@curbsoftware
@@ -70,8 +71,9 @@ cp -r cinnamon-color-timer-clock-desklet@curbsoftware/files/cinnamon-color-timer
 Or straight from git:
 
 ```bash
-git clone https://github.com/RobertAlexanderH/cinnamon-color-timer-clock-desklet.git
+git clone https://github.com/CurbSoftware/cinnamon-color-timer-clock-desklet.git || git -C cinnamon-color-timer-clock-desklet pull
 cd cinnamon-color-timer-clock-desklet
+mkdir -p ~/.local/share/cinnamon/desklets
 rm -rf ~/.local/share/cinnamon/desklets/cinnamon-color-timer-clock-desklet@curbsoftware
 cp -r files/cinnamon-color-timer-clock-desklet@curbsoftware \
    ~/.local/share/cinnamon/desklets/cinnamon-color-timer-clock-desklet@curbsoftware
